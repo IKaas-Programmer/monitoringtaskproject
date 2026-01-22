@@ -21,6 +21,7 @@ class Task extends Model
         'priority',
         'status',
         'due_date',
+        'completed_at',
     ];
 
     // Relasi ke Project: Task ini milik satu Project

@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->date('deadline');
             
             $table->enum('status', ['planned', 'on_progress', 'completed']) -> default('planned');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Project Manager
+            $table->foreignId('user_id')->constrained()->onDelete('cascade')->index(); // Project Manager
             $table->timestamps();
         });
     }
