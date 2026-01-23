@@ -13,5 +13,14 @@ class CommentSeeder extends Seeder
     public function run(): void
     {
         //
+        $tasks = \App\Models\Task::all();
+
+        foreach ($tasks as $task) {
+            \App\Models\Comment::create([
+                'task_id' => $task->id,
+                'user_id' => 1,
+                'body' => 'Progress sudah mencapai 50%, tinggal bagian responsif.',
+            ]);
+        }
     }
 }

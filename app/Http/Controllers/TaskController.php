@@ -8,31 +8,36 @@ use App\Models\Project;
 
 class TaskController extends Controller
 {
-    // mengubah status task dan check otomatis status project
+    /**
+     * Mengubah status task dan check otomatis status project
+     */
     public function updateStatus(Request $request, Task $task)
     {
-        // Validasi input agar status tidak diisi sembarang teks
-        $validated = $request->validate([
-            'status' => 'required|in:todo,on_progress,completed'
+        // 1. Validasi agar data yang masuk sesuai dengan ENUM di Database
+        $request->validate([
+            'status' => 'required|in:todo,in_progress,review,completed'
         ]);
 
-        // Menggunakan fill & save seringkali menghilangkan peringatan "too many arguments"
-        $task->status = $validated['status'];
-        $task->completed_at = ($validated['status'] === 'completed') ? now() : null;
-        $task->save();
+        // 2. Update status Task
+        $task->update([
+            'status' => $request->status,
+            'completed_at' => $request->status === 'completed' ? now() : null
+        ]);
 
-        // LOGIKA OTOMATIS: Update status project
+        // 3. LOGIKA OTOMATIS: Cek status Project-nya
         $project = $task->project;
 
-        // Gunakan exists() untuk efisiensi jika hanya ingin cek ada tidaknya task
-        $hasUnfinishedTasks = $project->tasks()->where('status', '!=', 'completed')->exists();
+        // Ambil jumlah task yang BELUM completed
+        $pendingTasksCount = $project->tasks()->where('status', '!=', 'completed')->count();
 
-        if (!$hasUnfinishedTasks) {
+        if ($pendingTasksCount === 0) {
+            // Jika semua task sudah 'completed', set project jadi 'completed'
             $project->update(['status' => 'completed']);
         } else {
-            $project->update(['status' => 'on_progress']);
+            // Jika masih ada yang pending, set project jadi 'in_progress'
+            $project->update(['status' => 'in_progress']);
         }
 
-        return back()->with('success', 'Status tugas diperbarui!');
+        return back()->with('success', 'Status tugas dan progres proyek diperbarui!');
     }
 }

@@ -18,8 +18,22 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Project Manager Admin',
+            'email' => 'AdminHitamPutih@example.com',
+            'password' => bcrypt('password'),
+            'role' => 'admin',
+        ]);
+
+        // 2. Membuat beberapa User Member (untuk ditugaskan ke Task)
+        User::factory(3)->create([
+            'role' => 'member'
+        ]);
+
+        // Memanggil Seeder lainnya
+        $this->call([
+            ProjectSeeder::class,
+            TaskSeeder::class,
+            CommentSeeder::class,
         ]);
     }
 }

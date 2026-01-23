@@ -13,10 +13,10 @@ return new class extends Migration {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->text('description') -> nullable();
+            $table->text('description')->nullable();
             $table->date('deadline');
-            
-            $table->enum('status', ['planned', 'on_progress', 'completed']) -> default('planned');
+
+            $table->enum('status', ['planned', 'in_progress', 'completed'])->default('planned');
             $table->foreignId('user_id')->constrained()->onDelete('cascade')->index(); // Project Manager
             $table->timestamps();
         });

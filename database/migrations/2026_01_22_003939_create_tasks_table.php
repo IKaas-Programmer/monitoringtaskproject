@@ -22,7 +22,7 @@ return new class extends Migration {
 
             // Status & Prioritas
             $table->enum('priority', ['low', 'medium', 'high', 'urgent'])->default('medium');
-            $table->enum('status', ['todo', 'in_progress', 'review', 'done'])->default('todo');
+            $table->enum('status', ['todo', 'in_progress', 'review', 'completed'])->default('todo');
 
             $table->date('due_date')->nullable();
             $table->timestamp('completed_at')->nullable();
