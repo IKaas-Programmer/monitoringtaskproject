@@ -8,7 +8,7 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
                     <div class="p-3 bg-blue-50 rounded-lg">
                         <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -33,6 +33,20 @@
                     <div>
                         <p class="text-sm text-gray-500 font-medium">In Progress Tasks</p>
                         <h4 class="text-2xl font-bold text-gray-800">{{ $stats['active_tasks'] }}</h4>
+                    </div>
+                </div>
+
+                {{-- Completed Projects (KARTU BARU) --}}
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+                    <div class="p-3 bg-green-50 rounded-lg">
+                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium">Completed Projects</p>
+                        <h4 class="text-2xl font-bold text-green-600">{{ $stats['completed_projects'] }}</h4>
                     </div>
                 </div>
 

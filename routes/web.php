@@ -20,6 +20,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Update Status Task
     Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
+    // Save Task baru
+    Route::post('/projects/{project}/tasks', [TaskController::class, 'store'])->name('tasks.store');
+    // Delete Task
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
 
     // Profile Management (Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

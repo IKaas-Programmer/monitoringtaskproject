@@ -10,22 +10,34 @@ class ProjectController extends Controller
 {
     public function dashboard()
     {
+        // Ambil data user yang sedang login
+        $user = auth()->user();
+
         // 1. Ambil Statistik Utama
         $stats = [
-            'total_projects' => Project::count(),
-            'active_tasks' => Task::where('status', 'in_progress')->count(),
-            'overdue_projects' => Project::where('status', '!=', 'completed')
+            'total_projects' => $user->projects()->count('*'),
+            'active_tasks' => Task::whereHas('project', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })->where('status', 'in_progress')->count('*'),
+
+            'overdue_projects' => $user->projects()
+                ->where('status', '!=', 'completed')
                 ->where('deadline', '<', now())
                 ->count(),
+
+            'completed_projects' => $user->projects()
+                ->where('status', 'completed')
+                ->count('*'),
         ];
 
-        // 2. Ambil Proyek Terbaru dengan hitungan task untuk progress bar
-        $recentProjects = Project::withCount([
-            'tasks',
-            'tasks as completed_tasks_count' => function ($query) {
-                $query->where('status', 'completed');
-            }
-        ])
+        // 2. Ambil Proyek Terbaru (Filter berdasarkan user yang login)
+        $recentProjects = $user->projects() // Menggunakan $user->projects() agar aman
+            ->withCount([
+                'tasks',
+                'tasks as completed_tasks_count' => function ($query) {
+                    $query->where('status', 'completed');
+                }
+            ])
             ->latest()
             ->take(5)
             ->get();
@@ -35,13 +47,13 @@ class ProjectController extends Controller
 
     public function index()
     {
-        $projects = Project::withCount([
-            'tasks',
-            'tasks as completed_tasks_count' => function ($query) {
-                $query->where('status', 'completed');
-            }
-        ])
-            ->with(['user'])
+        $projects = auth()->user()->projects() // Tambahkan auth()->user() di sini
+            ->withCount([
+                'tasks',
+                'tasks as completed_tasks_count' => function ($query) {
+                    $query->where('status', 'completed');
+                }
+            ])
             ->latest()
             ->paginate(10);
 
@@ -50,9 +62,11 @@ class ProjectController extends Controller
 
     public function show(Project $project)
     {
-        $project->load(['tasks.user', 'tasks.comments.user']);
+        // Project berdasarkan ID, tapi harus milik user yang sedang login
+        $project = auth()->user()->projects()
+            ->with(['tasks.user', 'tasks.comments.user'])
+            ->findOrFail($project->id); // Akan otomatis 404 jika data tidak ditemukan atau bukan milik user ini
 
-        // Menghitung progress untuk ditampilkan di detail
         $totalTasks = $project->tasks->count();
         $completedTasks = $project->tasks->where('status', 'completed')->count();
         $progress = $totalTasks > 0 ? ($completedTasks / $totalTasks) * 100 : 0;

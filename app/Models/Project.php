@@ -23,8 +23,12 @@ class Project extends Model
         'user_id',
     ];
 
+    protected $casts = [
+        'deadline' => 'date', // atau 'datetime'
+    ];
+
     /**
-     * Relasi ke User (Project Manager)
+     * Relasi ke User 
      */
     public function user(): BelongsTo
     {

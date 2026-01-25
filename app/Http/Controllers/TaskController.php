@@ -40,4 +40,44 @@ class TaskController extends Controller
 
         return back()->with('success', 'Status tugas dan progres proyek diperbarui!');
     }
+
+    // Simpan Task Baru ke dalam Project tertentu
+    public function store(Request $request, Project $project)
+    {
+        // 1. Validasi Input
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'priority' => 'required|in:low,medium,high',
+            'due_date' => 'nullable|date|after_or_equal:today',
+        ]);
+
+        // 2. Simpan ke Database melalui relasi project
+        $project->tasks()->create([
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'priority' => $validated['priority'],
+            'status' => 'todo', // Default tugas baru
+            'user_id' => auth()->id(), // Mencatat pembuat tugas
+            'due_date' => $validated['due_date'] ?? null, // Batas waktu jika ada
+        ]);
+
+        // 3. Update status project menjadi in_progress jika sebelumnya 'planned'
+        if ($project->status === 'planned') {
+            $project->update(['status' => 'in_progress']);
+        }
+
+        return redirect()->back()->with('success', 'Tugas baru berhasil ditambahkan!');
+    }
+
+    public function destroy(Task $task)
+    {
+        // Keamanan: Cek apakah task ini berada di bawah project milik user
+        if ($task->project->user_id !== auth()->id()) {
+            abort(403, 'Tindak akses tidak diizinkan.');
+        }
+
+        $task->delete();
+        return back()->with('success', 'Tugas berhasil dihapus!');
+    }
 }
