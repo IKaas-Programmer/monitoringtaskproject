@@ -70,6 +70,28 @@ class TaskController extends Controller
         return redirect()->back()->with('success', 'Tugas baru berhasil ditambahkan!');
     }
 
+    // Update Detail Task (Judul, Deskripsi, Prioritas, dll)
+    public function update(Request $request, Task $task)
+    {
+        // 1. Keamanan: Pastikan hanya pemilik proyek yang bisa edit
+        if ($task->project->user_id !== auth()->id()) {
+            abort(403, 'Akses ditolak.');
+        }
+
+        // 2. Validasi Data
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'priority' => 'required|in:low,medium,high',
+            'due_date' => 'nullable|date',
+        ]);
+
+        // 3. Eksekusi Update
+        $task->update($validated);
+
+        return back()->with('success', 'Tugas berhasil diperbarui!');
+    }
+
     public function destroy(Task $task)
     {
         // Keamanan: Cek apakah task ini berada di bawah project milik user

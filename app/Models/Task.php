@@ -24,6 +24,11 @@ class Task extends Model
         'completed_at',
     ];
 
+    protected $casts = [
+        'due_date' => 'date',
+        'completed_at' => 'datetime',
+    ];
+
     // Relasi ke Project: Task ini milik satu Project
     public function project(): BelongsTo
     {

@@ -94,4 +94,18 @@ class ProjectController extends Controller
         return redirect()->route('projects.index')
             ->with('success', 'Proyek berhasil dibuat!');
     }
+
+    public function destroy(Project $project)
+    {
+        // 1. Otorisasi: Pastikan user adalah pemilik proyek
+        if ($project->user_id !== auth()->id()) {
+            abort(403, 'Anda tidak memiliki akses untuk menghapus proyek ini.');
+        }
+
+        // 2. Eksekusi Hapus
+        // Jika di database Anda sudah set 'onDelete cascade', cukup panggil delete()
+        $project->delete('id');
+
+        return redirect()->route('projects.index')->with('success', 'Proyek berhasil dihapus permanen!');
+    }
 }
